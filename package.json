@@ -1,6 +1,6 @@
 {
   "name": "objectid-validator",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "FindById method in mongoose will give errors if object id is not in correct format. This module help to validate object id to avoid errors. It works as a middleware like bodymen. ",
   "main": "dist/index.js",
   "scripts": {
