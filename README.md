@@ -11,7 +11,7 @@ FindById method in mongoose will give errors if object id is not in correct form
 ```javascript
 import { idValidate } from "objectid-validator";
 
-router.post("/", idValidate({ id: { required: true } }), create);
+router.post("/create/", idValidate({ id: { required: true } }), create);
 
-// This will return Network status code 400 with error messages
+// This will return Network status code 400 with error messages if id is not valid
 ```
