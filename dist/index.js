@@ -1,5 +1,5 @@
 var _lodash = require('lodash')
-var objectID = require('mongodb').ObjectID
+var objectID = require('mongoose').Types.ObjectId
 
 Object.defineProperty(exports, '__esModule', {
   value: true
