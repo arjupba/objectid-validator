@@ -62,17 +62,17 @@ jobs:
           
       - name: Check String
         run: |
-          # echo ${{ inputs.TRIGGER_EVENT }}
-          echo "Inputs:"
-          for input_var in ${{ toJson(inputs) }}; do
-            input_name=$(echo "$input_var" | cut -d '=' -f1)
-            input_value=$(echo "$input_var" | cut -d '=' -f2-)
-            echo "$input_name: $input_value"
-          done
-          if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
-            echo "Error: The version does not contain the string beta"
-            exit 1
-          fi
+          echo ${{ github.event_name }}
+          # echo "Inputs:"
+          # for input_var in ${{ toJson(github.event_name) }}; do
+          #   input_name=$(echo "$input_var" | cut -d '=' -f1)
+          #   input_value=$(echo "$input_var" | cut -d '=' -f2-)
+          #   echo "$input_name: $input_value"
+          # done
+          # if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
+          #   echo "Error: The version does not contain the string beta"
+          #   exit 1
+          # fi
 
       - name: Create Release
         uses: actions/create-release@v1
