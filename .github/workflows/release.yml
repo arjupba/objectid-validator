@@ -15,7 +15,7 @@ on:
 jobs:
   prodRelease:
     if: ${{ github.event_name == 'push' }}
-    name: Continuous Deployment
+    name: Production Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -51,7 +51,7 @@ jobs:
 
   preProdRelease:
     if: ${{ github.event_name == 'workflow_dispatch' }}
-    name: Continuous Deployment
+    name: Pre Production Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -60,7 +60,7 @@ jobs:
           token: ${{ secrets.ACTION_TOKEN }}
           fetch-depth: 0
           
-      - name: Check String
+      - name: Verify this is a beta version
         run: |
           if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
             echo "Error: The version does not contain 'beta'"
@@ -69,7 +69,6 @@ jobs:
 
       - name: Create Release
         uses: actions/create-release@v1
-        if: ${{ steps.changelog.outputs.skipped == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
