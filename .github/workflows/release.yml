@@ -63,7 +63,7 @@ jobs:
       - name: Check String
         run: |
           if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
-            echo "Error: The version does not contain the string beta"
+            echo "Error: The version does not contain 'beta'"
             exit 1
           fi
 
