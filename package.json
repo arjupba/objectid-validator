@@ -24,5 +24,9 @@
   "bugs": {
     "url": "https://github.com/arjupba/objectid-validator/issues"
   },
-  "homepage": "https://github.com/arjupba/objectid-validator#readme"
+  "homepage": "https://github.com/arjupba/objectid-validator#readme",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "mongoose": "^8.3.1"
+  }
 }

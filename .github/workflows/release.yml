@@ -3,11 +3,18 @@ name: Release and Changelog
 on:
   push:
     branches:
-      - feat-3-implement-ci-cd
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Version Name
+        required: true
 
 
 jobs:
-  first:
+  prodRelease:
+    if: ${{ inputs.TRIGGER_EVENT == 'push' }}
     name: Continuous Deployment
     runs-on: ubuntu-latest
     steps:
@@ -20,6 +27,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - run: npm install conventional-changelog-conventionalcommits
           
       - name: Bump version, tag commit, and create changelog
@@ -28,16 +36,43 @@ jobs:
         with:
           github-token: ${{ secrets.ACTION_TOKEN }}
           skip-git-pull: true
+          version-file: './package.json,./package-lock.json'
           config-file-path: '.github/config/config.js'
-          pre-release: true
-          pre-release-identifier: beta
 
-      # - name: Create Release
-      #   uses: actions/create-release@v1
-      #   if: ${{ steps.changelog.outputs.skipped == 'false' }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.github_token }}
-      #   with:
-      #     tag_name: ${{ steps.changelog.outputs.tag }}
-      #     release_name: ${{ steps.changelog.outputs.tag }}
-      #     body: ${{ steps.changelog.outputs.clean_changelog }}
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+
+  preProdRelease:
+    if: ${{ inputs.TRIGGER_EVENT == 'workflow_dispatch' }}
+    name: Continuous Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.2
+        with:
+          token: ${{ secrets.ACTION_TOKEN }}
+          fetch-depth: 0
+          
+      - name: Check String
+        run: |
+          if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
+            echo "Error: The version does not contain the string beta"
+            exit 1
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }}
+          prerelease: true
