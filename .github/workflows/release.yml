@@ -62,7 +62,13 @@ jobs:
           
       - name: Check String
         run: |
-          echo ${{ inputs.TRIGGER_EVENT }}
+          # echo ${{ inputs.TRIGGER_EVENT }}
+          echo "Inputs:"
+          for input_var in ${{ toJson(inputs) }}; do
+            input_name=$(echo "$input_var" | cut -d '=' -f1)
+            input_value=$(echo "$input_var" | cut -d '=' -f2-)
+            echo "$input_name: $input_value"
+          done
           if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
             echo "Error: The version does not contain the string beta"
             exit 1
