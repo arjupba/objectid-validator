@@ -4,7 +4,9 @@
   "description": "FindById method in mongoose will give errors if object id is not in correct format. This module help to validate object id to avoid errors. It works as a middleware like bodymen. ",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\"",
+    "set-version": "node -e \"const { writeFileSync, readFileSync } = require('fs'); const packageJson = JSON.parse(readFileSync('package.json')); packageJson.version = process.argv[1]; writeFileSync('package.json', JSON.stringify(packageJson, null, 2));\"",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -24,5 +26,14 @@
   "bugs": {
     "url": "https://github.com/arjupba/objectid-validator/issues"
   },
-  "homepage": "https://github.com/arjupba/objectid-validator#readme"
+  "homepage": "https://github.com/arjupba/objectid-validator#readme",
+  "dependencies": {
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.3.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.2.2",
+    "@commitlint/config-conventional": "^19.2.2"
+  }
 }

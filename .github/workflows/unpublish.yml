@@ -1,0 +1,40 @@
+name: Unpublish Version
+
+on:
+  release:
+    types: [deleted]
+  # workflow_dispatch:
+  #   inputs:
+  #     version:
+  #       type: string
+  #       description: Version Name
+  #       required: true
+  #     otp:
+  #       type: string
+  #       description: OTP
+  #       required: true
+
+jobs:
+  unpublish:
+    name: Unpublish npm package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies and build 🔧
+        run: npm ci
+      - name: Unpublish package on NPM 📦
+        run: |
+          npm -v
+          npm whoami
+          version=$(echo "${{ github.event.release.tag_name }}" | sed 's/^v//')
+          echo $version
+          # npm unpublish objectid-validator@${{ github.event.inputs.version }} --otp=${{ github.event.inputs.otp }}
+          npm unpublish objectid-validator@$version --force
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
