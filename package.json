@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "set-version": "node -e \"const { writeFileSync, readFileSync } = require('fs'); const packageJson = JSON.parse(readFileSync('package.json')); packageJson.version = process.argv[1]; writeFileSync('package.json', JSON.stringify(packageJson, null, 2));\"",
-    "prepare": "husky"
+    "prepare": "npx husky"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.2",
-    "@commitlint/config-conventional": "^19.2.2"
+    "@commitlint/config-conventional": "^19.2.2",
+    "@commitlint/types": "^19.0.3"
   }
 }
