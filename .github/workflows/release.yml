@@ -1,0 +1,96 @@
+name: Release and Changelog
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Version Name
+        required: true
+
+jobs:
+  prodRelease:
+    if: ${{ github.event_name == 'push' }}
+    name: Production Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3.0.2
+        with:
+          token: ${{ secrets.PA_TOKEN }}
+          fetch-depth: 0
+          
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm install -D conventional-changelog-conventionalcommits
+          
+      - name: Bump version, tag commit, and create changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3.14.1
+        with:
+          github-token: ${{ secrets.PA_TOKEN }}
+          skip-git-pull: true
+          version-file: './package.json,./package-lock.json'
+          config-file-path: '.github/config/config.js'
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PA_TOKEN }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+
+  preProdRelease:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Pre Production Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.2
+        with:
+          token: ${{ secrets.PA_TOKEN }}
+          fetch-depth: 0
+          
+      - name: Verify this is a beta version
+        run: |
+          if [[ ${{ github.event.inputs.version }} != *"beta"* ]]; then
+            echo "Error: The version does not contain 'beta'"
+            exit 1
+          fi
+
+      - name: Step 1
+        id: step1
+        run: |
+          npm run set-version -- ${{ github.event.inputs.version }}
+          npm i
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "version updated"
+          git push
+
+          last_commit=$(git rev-parse HEAD);
+          echo "::set-output name=last_commit::$last_commit"
+
+      - name: Step 2
+        run: |
+          echo "Output from Step 1: ${{ steps.step1.outputs.last_commit }}"
+          
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PA_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }}
+          prerelease: true
+          commitish: ${{ steps.step1.outputs.last_commit }}
